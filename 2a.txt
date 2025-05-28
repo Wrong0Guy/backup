@@ -1,0 +1,32 @@
+Footer.js  
+function  Footer(props) 
+{ 
+<div><p>Name :{props.tagline}</p></div> 
+}  
+export default Footer 
+Header.js 
+function Header(props) 
+{ 
+<div><p>Name :{props.title}</p>  </div> 
+}  
+export default Header 
+Student.js 
+function Student(props) 
+{ 
+<div><p>Name :{props.name}</p></div> 
+}  
+export default Student 
+App.js  
+import  Student from './Student.jsx' 
+import Header from './Header.jsx' 
+import Footer from './Footer.jsx' 
+function App() { 
+return ( 
+<> 
+Student name="Sudarshan" 
+Header  title=" React lAb " 
+Footer tagline ="Jain College of Engineering" 
+</> 
+); 
+} 
+export default App; 

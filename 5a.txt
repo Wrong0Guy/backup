@@ -1,0 +1,56 @@
+App.js 
+import React, { useState } from "react"; 
+import "./App.css"; 
+const BasicFigure = ({ imageUrl, caption, onDelete }) => { 
+return ( 
+<div className="figure-container"> 
+<img src={imageUrl} alt={caption} className="figure-image" /> 
+<p className="figure-caption">{caption}</p> 
+<button className="delete-btn" onClick={onDelete}>Remove</button> 
+</div> 
+); 
+}; 
+const FigureList = () => { 
+const [figures, setFigures] = useState([ 
+{ id: 1, imageUrl: "https://picsum.photos/200/300", caption: "Image 1" }, 
+{ id: 2, imageUrl: "https://picsum.photos/200/300", caption: "Image 2" }, 
+]); 
+const addFigure = () => { 
+const newId = figures.length + 1; 
+setFigures([ 
+...figures, 
+{ id: newId, imageUrl: `https://via.placeholder.com/150`, caption: `Image 
+${newId}` }, 
+]); 
+}; 
+const removeFigure = (id) => { 
+setFigures(figures.filter((figure) => figure.id !== id)); 
+}; 
+return ( 
+<div className="figure-list"> 
+<button className="add-btn" onClick={addFigure}> 
+Add Image 
+</button> 
+<div className="figure-grid"> 
+        {figures.map((figure) => ( 
+          <BasicFigure 
+            key={figure.id} 
+            imageUrl={figure.imageUrl} 
+            caption={figure.caption} 
+            onDelete={() => removeFigure(figure.id)} 
+          /> 
+        ))} 
+      </div> 
+    </div> 
+  ); 
+}; 
+const App = () => { 
+  return ( 
+    <div className="App"> 
+      <h1>Image Gallery</h1> 
+      <FigureList /> 
+    </div> 
+  ); 
+}; 
+ 
+export default App; 

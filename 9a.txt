@@ -1,0 +1,59 @@
+1. Create a folder Components  
+2. Create a file Header.js  
+Header.js  
+export default function Header(){ 
+return( 
+<h1> Header: React  Router Tutorial </h1> 
+) 
+} 
+About.js  
+import Header  from '../Components/Header' 
+export default function(){ 
+return( 
+<> 
+<Header /> 
+<h2> About  </h2> 
+</> 
+) 
+} 
+Contact.js 
+import Header  from '../Components/Header' 
+export default function(){ 
+return( 
+<> 
+<Header /> 
+<h2> Contact </h2></> 
+) 
+} 
+Home.js  
+export default function(){ 
+return( 
+) 
+} 
+<h2> Home  </h2> 
+App.js  
+import { BrowserRouter,Routes,Route } from 'react-router-dom'; 
+import Home from './Pages/Home'; 
+import Contact from './Pages/Contact'; 
+import About from './Pages/About'; 
+import './App.css'; 
+export default function App() { 
+  return ( 
+         <div> 
+          <BrowserRouter> 
+          <Routes>  
+          <Route index  element = {<Home/>} /> 
+          <Route path ='/home' element ={<Home />}/> 
+          </Routes> 
+          <Routes>  
+          <Route index  element = {<Contact/>} /> 
+          <Route path ='/contact' element ={<Contact />}/> 
+          </Routes> 
+          <Routes>  
+          <Route index  element = {<About/>}/> 
+          <Route path ='/about' element ={<About />}/> 
+          </Routes> 
+          </BrowserRouter> 
+         </div> 
+); 
+} 
