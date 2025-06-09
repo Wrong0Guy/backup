@@ -1,0 +1,113 @@
+import csv
+
+def find_s(csv_filepath):
+    """
+    Implements the Find-S algorithm.
+
+    Args:
+        csv_filepath (str): The path to the CSV file containing training data.
+                           The last column is assumed to be the target concept
+                           ('Yes'/'No' or similar positive/negative labels).
+
+    Returns:
+        list: The most specific hypothesis found, represented as a list
+              of attribute constraints ('?', 'specific_value', or initial '∅').
+        list: The list of attribute names (header).
+    """
+    hypothesis = None
+    attributes = []
+    positive_label = 'Yes' # Assume 'Yes' indicates a positive example
+
+    try:
+        with open(csv_filepath, 'r') as f:
+            reader = csv.reader(f)
+
+            # Read header to get attribute names and count
+            header = next(reader)
+            attributes = header[:-1] # All columns except the last one
+            num_attributes = len(attributes)
+
+            print(f"Attributes: {attributes}")
+            print("-" * 30)
+
+            # Initialize hypothesis
+            # Using '∅' (empty set symbol) for initial specific hypothesis
+            hypothesis = ['∅'] * num_attributes
+            print(f"Initial Hypothesis: {hypothesis}")
+
+            # Process training examples
+            for i, row in enumerate(reader):
+                if not row: # Skip empty rows if any
+                    continue
+
+                instance = row[:-1]
+                target_concept = row[-1]
+
+                print(f"\nProcessing Instance {i+1}: {instance}")
+                print(f"Target: {target_concept}")
+
+                # Only process positive examples
+                if target_concept.strip().lower() == positive_label.strip().lower():
+                    print("Instance is Positive. Updating hypothesis...")
+                    for j in range(num_attributes):
+                        # If hypothesis attribute is initial '∅', set it
+                        if hypothesis[j] == '∅':
+                            hypothesis[j] = instance[j]
+                        # If hypothesis attribute doesn't match instance, generalize
+                        elif hypothesis[j] != instance[j]:
+                            hypothesis[j] = '?'
+                        # Otherwise (it matches), keep it specific
+                        # else: pass
+                    print(f"Updated Hypothesis: {hypothesis}")
+                else:
+                    print("Instance is Negative. Ignoring.")
+
+    except FileNotFoundError:
+        print(f"Error: File not found at {csv_filepath}")
+        return None, None
+    except Exception as e:
+        print(f"An error occurred: {e}")
+        return None, None
+
+    # Check if any positive examples were found
+    if all(h == '∅' for h in hypothesis):
+       print("\nWarning: No positive examples found in the dataset. Hypothesis remains initial.")
+
+
+    return hypothesis, attributes
+
+# --- Demonstration ---
+if __name__ == "__main__":
+    csv_file = 'training_data.csv'
+    print(f"Running Find-S algorithm on '{csv_file}'...")
+
+    final_hypothesis, attribute_names = find_s(csv_file)
+
+    if final_hypothesis is not None:
+        print("\n" + "=" * 30)
+        print("Find-S Algorithm Finished.")
+        print(f"Attribute Names: {attribute_names}")
+        print(f"Final Hypothesis: {final_hypothesis}")
+        print("=" * 30)
+
+        # Interpretation of the final hypothesis
+        if attribute_names:
+             print("\nInterpretation:")
+             desc = []
+             valid_hypothesis = False
+             for i in range(len(final_hypothesis)):
+                 if final_hypothesis[i] != '∅' and final_hypothesis[i] != '?':
+                     desc.append(f"{attribute_names[i]} = {final_hypothesis[i]}")
+                     valid_hypothesis = True
+                 elif final_hypothesis[i] == '?':
+                     desc.append(f"{attribute_names[i]} = Any")
+                     valid_hypothesis = True
+                 # If '∅', it means no positive examples influenced this attribute
+
+             if valid_hypothesis:
+                 print("The most specific hypothesis consistent with the positive examples is:")
+                 print(" -> If " + " AND ".join(desc) + ", then EnjoySport = Yes")
+             elif all(h == '∅' for h in final_hypothesis):
+                  print("No positive examples were found to form a hypothesis.")
+             else:
+                  print("Hypothesis could not be fully determined (check for '∅').")

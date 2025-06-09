@@ -1,0 +1,31 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+import seaborn as sns
+from sklearn.datasets import fetch_california_housing
+
+# Load California housing dataset
+data = fetch_california_housing()
+df = pd.DataFrame(data.data, columns=data.feature_names)
+
+# Set Seaborn style for better visualization
+sns.set_style("whitegrid")
+
+# Create histograms for all numerical features
+plt.figure(figsize=(12, 8))
+df.hist(bins=30, figsize=(12, 8), edgecolor='black', grid=False)
+plt.suptitle("Histograms of Numerical Features", fontsize=16, fontweight='bold')
+plt.show()
+
+# Generate box plots for all numerical features to identify outliers
+plt.figure(figsize=(12, 8))
+for i, col in enumerate(df.columns, 1):
+    plt.subplot(3, 3, i)
+    sns.boxplot(y=df[col], color='skyblue', width=0.5, flierprops={'marker': 'o', 'markerfacecolor': 'red', 'markersize': 5})
+    plt.title(col, fontsize=12, fontweight='bold')
+plt.tight_layout()
+plt.suptitle("Box Plots of Numerical Features", fontsize=16, fontweight='bold', y=1.02)
+plt.show()
+
+# Summary statistics for deeper insights
+print("Summary Statistics:\n")
+print(df.describe())

@@ -1,0 +1,53 @@
+import numpy as np
+from collections import Counter
+
+# Step 1: Generate 100 random values in [0, 1]
+np.random.seed(42)  # For reproducibility
+X = np.random.rand(100)
+
+# Step 2: Label the first 50 points
+labels = []
+for i in range(50):
+    if X[i] <= 0.5:
+        labels.append('Class1')
+    else:
+        labels.append('Class2')
+
+# The remaining points to classify
+X_test = X[50:]
+true_labels_test = []
+for i in range(50, 100):
+    if X[i] <= 0.5:
+        true_labels_test.append('Class1')
+    else:
+        true_labels_test.append('Class2')
+
+# Function to perform k-NN classification
+def knn_classify(train_points, train_labels, test_point, k):
+    # Calculate distances
+    distances = np.abs(train_points - test_point)
+    # Get indices of k smallest distances
+    k_indices = distances.argsort()[:k]
+    # Get the labels of k nearest neighbors
+    k_labels = [train_labels[idx] for idx in k_indices]
+    # Majority vote
+    vote_counts = Counter(k_labels)
+    return vote_counts.most_common(1)[0][0]
+
+# Perform classification for different k values
+k_values = [1, 2, 3, 4, 5, 20, 30]
+results = {}
+
+for k in k_values:
+    predicted_labels = []
+    for test_point in X_test:
+        predicted_label = knn_classify(X[:50], labels, test_point, k)
+        predicted_labels.append(predicted_label)
+    results[k] = predicted_labels
+
+# Output the results
+for k in k_values:
+    print(f"\nk = {k}")
+    print("Test Point | Predicted Label | True Label")
+    for i, (test_point, pred_label, true_label) in enumerate(zip(X_test, results[k], true_labels_test), start=51):
+        print(f"{test_point:.3f}       | {pred_label}            | {true_label}")

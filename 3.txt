@@ -1,0 +1,119 @@
+Principal Component Analysis (PCA) - Code and Explanation
+
+Principal Component Analysis (PCA) on Iris Dataset
+===================================================
+PCA is a dimensionality reduction technique. It finds new axes (principal components)
+along which the data varies the most. By projecting the data onto fewer dimensions, we
+can simplify the dataset while retaining most of its information.
+This example reduces the Iris dataset from 4 dimensions to 2 dimensions.
+========================================================================================
+Step 1: Load the Iris Dataset
+-----------------------------
+- We load the dataset using sklearn.
+- X contains the 4 features for 150 samples.
+- y contains the target class (0: Setosa, 1: Versicolor, 2: Virginica).
+Code:
+------
+from sklearn.datasets import load_iris
+iris = load_iris()
+X = iris.data
+y = iris.target
+target_names = iris.target_names
+========================================================================================
+Step 2: Standardize the Features
+-------------------------------
+- PCA is affected by the scale of the data.
+- We standardize so each feature has mean=0 and std=1.
+Code:
+------
+import numpy as np
+X_mean = np.mean(X, axis=0)
+X_std = np.std(X, axis=0)
+X_centered = (X - X_mean) / X_std
+========================================================================================
+Step 3: Compute the Covariance Matrix
+-------------------------------------
+- Covariance matrix tells how much each feature varies with others.
+
+Code:
+------
+cov_matrix = np.cov(X_centered.T)
+========================================================================================
+Step 4: Compute Eigenvalues and Eigenvectors
+--------------------------------------------
+- Eigenvectors define the directions of the new feature space.
+- Eigenvalues tell us the importance of those directions.
+Code:
+------
+eigenvalues, eigenvectors = np.linalg.eig(cov_matrix)
+========================================================================================
+Step 5: Sort Eigenvalues and Eigenvectors
+-----------------------------------------
+- Sort the eigenvalues in descending order and sort eigenvectors to match.
+Code:
+------
+sorted_indices = np.argsort(eigenvalues)[::-1]
+sorted_eigenvectors = eigenvectors[:, sorted_indices]
+sorted_eigenvalues = eigenvalues[sorted_indices]
+========================================================================================
+Step 6: Select the Top k Eigenvectors (k=2)
+-------------------------------------------
+- We reduce from 4D to 2D, so we pick the top 2 eigenvectors.
+Code:
+------
+n_components = 2
+eigenvector_subset = sorted_eigenvectors[:, :n_components]
+========================================================================================
+Step 7: Transform the Data (Project onto new subspace)
+------------------------------------------------------
+- Multiply the standardized data by the top eigenvectors.
+Code:
+------
+X_reduced = X_centered.dot(eigenvector_subset)
+========================================================================================
+
+Step 8: Calculate Explained Variance
+------------------------------------
+- Explained variance tells how much information (variance) is retained.
+Code:
+------
+explained_variance_ratio = sorted_eigenvalues / np.sum(sorted_eigenvalues)
+for i in range(n_components):
+print(f"PC{i+1}: {explained_variance_ratio[i]:.4f}")
+total_variance_retained = np.sum(explained_variance_ratio[:n_components])
+print(f"Total variance retained in {n_components} components:
+{total_variance_retained:.4f}")
+========================================================================================
+Step 9: Plot the Reduced Data in 2D
+-----------------------------------
+- Visualize the 2D projection, coloring by species.
+Code:
+------
+import matplotlib.pyplot as plt
+plt.figure(figsize=(8, 6))
+for target, color, label in zip([0, 1, 2], ['red', 'green', 'blue'], target_names):
+plt.scatter(X_reduced[y == target, 0],
+X_reduced[y == target, 1],
+alpha=0.7,
+color=color,
+label=label)
+plt.xlabel('Principal Component 1')
+plt.ylabel('Principal Component 2')
+plt.title('PCA on Iris Dataset (4D reduced to 2D)')
+plt.legend()
+plt.grid(True)
+plt.show()
+========================================================================================
+Explained Variance Output Example:
+----------------------------------
+PC1: 0.7277
+PC2: 0.2303
+Total variance retained in 2 components: 0.9580
+
+This shows that the first two principal components capture around 95.8% of the total
+variance.
+========================================================================================
+Summary:
+--------
+- We reduced a 4D dataset to 2D while retaining most of the information.
+- We visualized the separation of species based on principal components.
