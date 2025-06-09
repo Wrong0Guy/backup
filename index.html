@@ -13,6 +13,9 @@
         flex-direction: column;
         align-items: center;
         background-color: #f5f5f5;
+        position: relative;
+        min-height: 100vh;
+        padding-bottom: 50px; /* Space for counter */
       }
 
       h1 {
@@ -174,10 +177,48 @@
         font-weight: bold;
         color: #333;
       }
+      
+      /* Visit Counter Styles */
+      #visit-counter {
+        position: fixed;
+        bottom: 15px;
+        left: 50%;
+        transform: translateX(-50%);
+        background-color: rgba(0, 0, 0, 0.8);
+        color: white;
+        padding: 8px 20px;
+        border-radius: 20px;
+        font-size: 14px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+      
+      .counter-icon {
+        font-size: 16px;
+      }
+      
+      .counter-pulse {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        background-color: #4caf50;
+        border-radius: 50%;
+        margin-right: 5px;
+        animation: pulse 1.5s infinite;
+      }
+      
+      @keyframes pulse {
+        0% { transform: scale(0.9); opacity: 0.7; }
+        50% { transform: scale(1.1); opacity: 1; }
+        100% { transform: scale(0.9); opacity: 0.7; }
+      }
     </style>
   </head>
   <body>
-    <h1>Web Dev Resources</h1>
+    <h1>Resources</h1>
     
     <!-- Action Buttons moved to the top -->
     <div class="action-buttons">
@@ -206,23 +247,98 @@
     </div>
     
     <div id="error-message" class="error-message"></div>
+    
+    <!-- Visit Counter -->
+    <div id="visit-counter">
+      <span class="counter-pulse"></span>
+      <span class="counter-icon">👁️</span>
+      <span id="counter-value">Loading...</span>
+      <span>visits</span>
+    </div>
 
     <script>
+      // Visit Counter Functionality
+      function updateVisitCounter() {
+        let visitCount = localStorage.getItem('siteVisitCount');
+        
+        if (visitCount === null) {
+          // First visit
+          visitCount = 1;
+        } else {
+          // Increment existing count
+          visitCount = parseInt(visitCount) + 1;
+        }
+        
+        // Update storage and display
+        localStorage.setItem('siteVisitCount', visitCount);
+        document.getElementById('counter-value').textContent = visitCount;
+      }
+      
+      // Initialize counter when page loads
+      updateVisitCounter();
+      
+      // Improved DevTools detection with alerts
+      let devToolsOpen = false;
+      let lastAlertTime = 0;
+      
+      function checkDevTools() {
+        const threshold = 160;
+        const widthDiff = window.outerWidth - window.innerWidth;
+        const heightDiff = window.outerHeight - window.innerHeight;
+        const now = Date.now();
+        
+        // Only show alert once every 5 seconds maximum
+        if ((widthDiff > threshold || heightDiff > threshold) && 
+            !devToolsOpen && 
+            (now - lastAlertTime > 5000)) {
+          devToolsOpen = true;
+          lastAlertTime = now;
+          alert("Developer tools are not allowed. Please close them to continue using this website.");
+        } else if (widthDiff <= threshold && heightDiff <= threshold) {
+          devToolsOpen = false;
+        }
+      }
+
+      // Run check every 500ms
+      setInterval(checkDevTools, 500);
+
+      // Prevent right-click menu
+      document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+        alert("Right-click is disabled on this website.");
+      });
+      
+      // Prevent keyboard shortcuts
+      document.addEventListener('keydown', function(e) {
+        // Disable F12, Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+U
+        const now = Date.now();
+        if ((e.key === 'F12' || 
+            e.keyCode === 123 || 
+            (e.ctrlKey && e.shiftKey && e.key === 'I') || 
+            (e.ctrlKey && e.shiftKey && e.key === 'J') || 
+            (e.ctrlKey && e.key === 'u')) &&
+            (now - lastAlertTime > 5000)) {
+          e.preventDefault();
+          lastAlertTime = now;
+          alert("This keyboard shortcut is disabled. Developer tools are not allowed on this website.");
+        }
+      });
+      
       const txtData = [
-        { name: "1", url: "1a.txt" },
-        { name: "2", url: "2a.txt" },
-        { name: "3", url: "3a.txt" },
-        { name: "4", url: "4a.txt" },
-        { name: "5", url: "5a.txt" },
-        { name: "6", url: "6a.txt" },
-        { name: "7", url: "7a.txt" },
-        { name: "8", url: "8a.txt" },
-        { name: "9", url: "9a.txt" },
-        { name: "10", url: "10a.txt" },
+        { name: "1", url: "1.txt" },
+        { name: "2", url: "2.txt" },
+        { name: "3", url: "3.txt" },
+        { name: "4", url: "4.txt" },
+        { name: "5", url: "5.txt" },
+        { name: "6", url: "6.txt" },
+        { name: "7", url: "7.txt" },
+        { name: "8", url: "8.txt" },
+        { name: "9", url: "9.txt" },
+        { name: "10", url: "10.txt" },
       ];
 
       const pdfData = [
-        { name: "React_PDF", url: "react Sudarshan.pdf", downloadName: "React" },
+        // { name: "React_PDF", url: "react Sudarshan.pdf", downloadName: "React" },
       ];
 
       // DOM elements
